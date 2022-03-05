@@ -1,0 +1,230 @@
+package prueba;
+
+import java.util.ArrayList;
+
+import java.util.List;
+import java.util.Scanner;
+import java.util.Stack;
+
+public class ExpressionMain {
+
+public static void main(String[] args) {
+expressionCalculator();
+}
+
+private static void expressionCalculator() {
+
+System.out.println("This is a polynomials program.\n" +
+"Please enter a valid command:\n" +
+"[?] Read a Polynomial.\n" +
+"[=] Return a Polynomial.\n" +
+"[+] Sum two Polynomial.\n" +
+"[-] Difference two Polynomial。 \n" +
+"[*] Mult one Polynomial with a term Polynomial.\n" +
+"[Q] Quit.\n");
+
+Scanner scanner = new Scanner(System.in);
+boolean isTheWorldAlive = true;
+
+Stack<Term> stack = new Stack<Term>();
+
+while (isTheWorldAlive) {
+System.out.println("Select command and presss <Enter>:");
+String command = scanner.next();
+if ("?".equals(command)) {
+boolean isCurrentExpressionInProgress = true;
+
+Term current = new Term();
+boolean firstTime = true;
+while (isCurrentExpressionInProgress) {
+System.out.println("coefficient?");
+int xishu = scanner.nextInt();
+if (xishu != 0) {
+System.out.println("exponent?");
+int zhishu = scanner.nextInt();
+if (zhishu != 0) {
+if(firstTime){
+current.setXishu(xishu);
+current.setZhishu(zhishu);
+firstTime = false;
+}else{
+Term temp = current;
+
+while(temp.next != null){
+temp = temp.next;
+}
+temp.next = new Term(xishu, zhishu);
+
+}
+
+} else {
+System.out.println("The following has been pushed to Stack:");
+System.out.println(current.toString());
+stack.push(current);
+isCurrentExpressionInProgress = false;
+}
+
+} else {
+System.out.println("The following has been pushed to Stack:");
+System.out.println(current.toString());
+stack.push(current);
+isCurrentExpressionInProgress = false;
+}
+}
+
+} else if("+".equals(command)){
+System.out.println(Expression.add(stack.pop(), stack.pop()));
+
+}else if("-".equals(command)){
+System.out.println(Expression.minus(stack.pop(), stack.pop()));
+
+}else if("*".equals(command)){
+System.out.println(Expression.mutiple(stack.pop(), stack.pop()));
+}
+else if ("Q".equalsIgnoreCase(command)) {
+isTheWorldAlive = false;
+}
+
+
+}
+}
+
+}
+
+class Term {
+private int xishu;
+private int zhishu;
+
+Term next = null;
+
+Term(){}
+Term(int xishu, int zhishu){
+this.xishu = xishu;
+this.zhishu = zhishu;
+this.next = null;
+}
+public int getXishu() {
+return xishu;
+}
+
+public void setXishu(int xishu) {
+this.xishu = xishu;
+}
+
+public int getZhishu() {
+return zhishu;
+}
+
+public void setZhishu(int zhishu) {
+this.zhishu = zhishu;
+}
+
+ 
+
+public String toString(){
+String toString = xishu+"X^"+zhishu;
+Term term = this.next;
+while (term != null){
+int nextXishu = term.getXishu();
+toString = toString + ((nextXishu>0)?"+"+nextXishu:nextXishu)+"X^"+term.getZhishu();
+term = term.next;
+}
+
+return toString;
+}
+}
+
+class Expression {
+public static Term add(Term t1, Term t2){
+if(t1 == null){
+return t2;
+}else if(t2 == null){
+return t1;
+}else{
+Term term = new Term();
+if(t1.getZhishu() > t2.getZhishu()){
+term.setZhishu(t1.getZhishu());
+term.setXishu(t1.getXishu());
+t1 = t1.next;
+}else if(t1.getZhishu() == t2.getZhishu()){
+term.setZhishu(t1.getZhishu());
+term.setXishu(t1.getXishu() + t2.getXishu());
+t1 = t1.next;
+t2 = t2.next;
+}else{
+term.setZhishu(t2.getZhishu());
+term.setXishu(t2.getXishu());
+t2 = t2.next;
+}
+term.next = add(t1, t2);
+
+return term;
+}
+
+}
+
+public static Term minus(Term t1, Term t2){
+if(t1 == null){
+return t2;
+}else if(t2 == null){
+return t1;
+}else{
+Term term = new Term();
+if(t1.getZhishu() > t2.getZhishu()){
+term.setZhishu(t1.getZhishu());
+term.setXishu(t1.getXishu());
+t1 = t1.next;
+}else if(t1.getZhishu() == t2.getZhishu()){
+term.setZhishu(t1.getZhishu());
+term.setXishu(t2.getXishu() - t1.getXishu());
+t1 = t1.next;
+t2 = t2.next;
+}else{
+term.setZhishu(t2.getZhishu());
+term.setXishu(t2.getXishu() * -1);
+t2 = t2.next;
+}
+
+term.next = minus(t1, t2);
+
+return term;
+}
+
+
+}
+
+public static Term mutiple(Term t1, Term t2){
+Term temTerm;
+if(t1.getXishu() < t2.getXishu()){
+temTerm = t1;
+t1 = t2;
+t2 = temTerm;
+}
+
+List<Term> expressions = new ArrayList<Term>();
+expressions.add(mutipleSingleTermToWholeTerm(t1, t2));
+while (t2.next != null){
+t2 = t2.next;
+expressions.add(mutipleSingleTermToWholeTerm(t1, t2));
+}
+
+Term term = expressions.get(0);
+for(int i=1; i<expressions.size(); i++){
+term = add(term, expressions.get(i));
+}
+
+return term;
+}
+
+private static Term mutipleSingleTermToWholeTerm(Term t1, Term t2){
+Term term = new Term();
+term.setZhishu(t1.getZhishu() + t2.getZhishu());
+term.setXishu(t1.getXishu() * t2.getXishu());
+while (t1.next != null){
+t1 = t1.next;
+term.next = mutipleSingleTermToWholeTerm(t1, t2);
+}
+
+return term;
+}
+}
