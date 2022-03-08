@@ -1,0 +1,78 @@
+package prueba;
+
+
+public class Lista {
+    protected Nodo cabeza;//punteros, inicio y final
+    
+   public Lista(){
+       cabeza = null;
+   }
+   
+   public void insertarPrimero(float coef, int exp){
+       if (cabeza == null){
+           cabeza = new Nodo(coef,exp);
+          
+       }else{
+           Nodo temp = cabeza;
+           Nodo nuevo = new Nodo(coef,exp);
+           nuevo.enlaceSiguiente(temp);
+           cabeza = nuevo;
+       }
+       
+   }
+  
+   public void imprimir(){
+       Nodo temporal = cabeza;
+       do{
+           System.out.printf(temporal.coefficient +"x^"+temporal.exponent);
+           temporal = temporal.siguiente;
+           
+           
+           if(temporal!=null){
+               System.out.printf(" + ");
+               
+           }else{
+               System.out.printf("\n");
+           }
+       }while(temporal!=null);
+       
+   }
+   public float obtenerCoef(){
+       float coeficiente= 0;
+       Nodo temp = cabeza;
+       coeficiente= temp.coefficient;
+       return coeficiente;
+       
+   }
+   public int obtenerExpo(){
+       int exponente = 0;
+       Nodo temp=cabeza;
+       exponente = temp.exponent;
+       return exponente;
+   }
+   
+   public Lista suma(Lista poliuno, Lista polidos){
+       Lista  p1 = poliuno;
+       Lista  p2 = polidos;
+       Lista  p3 =  new Lista();
+       
+       while(p1!=null && p2!=null){
+           if(p1.obtenerExpo()== p2.obtenerExpo()){
+               p3.insertarPrimero(p1.obtenerCoef()+p2.obtenerCoef(), p1.obtenerExpo());
+               
+           }
+           p1.cabeza = p1.cabeza.siguiente;
+           p2.cabeza = p2.cabeza.siguiente;
+       }
+       return p3;
+       
+   }
+   
+   public boolean estaVacia(){
+       return(cabeza == null)?true:false;
+   }
+    
+    
+    
+    
+}
